@@ -71,6 +71,23 @@
   }
   footer b{color:#aaa}
 
+  #thanks{
+    display:none;text-align:center;animation:fadeIn .6s ease;
+  }
+  #thanks.show{display:block}
+  #thanks h2{
+    font-size:clamp(26px,6vw,42px);
+    background:linear-gradient(90deg,#00e5ff,#0a84ff,#ff4d9e);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:glow 1.8s ease-in-out infinite alternate;
+  }
+  #thanks p{color:#aaa;margin-top:10px;font-size:16px}
+  @keyframes fadeIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+  @keyframes glow{
+    from{filter:drop-shadow(0 0 5px #0a84ff)}
+    to{filter:drop-shadow(0 0 20px #ff4d9e)}
+  }
+
   /* mobile tweak */
   @media (max-width:480px){
     .grid{grid-template-columns:repeat(5,1fr);gap:10px}
@@ -86,6 +103,11 @@
 <div class="grid" id="grid"></div>
 <video id="player" controls autoplay playsinline></video>
 <button id="back">⬅ Back</button>
+
+<div id="thanks">
+  <h2>🎉 Thank You for Participating 🎉</h2>
+  <p>All numbers completed</p>
+</div>
 
 <footer>
   <b>Project Organized by S5 BCA Students</b><br>
@@ -129,7 +151,12 @@ backBtn.onclick=()=>{
   player.pause();
   player.classList.remove('show');
   backBtn.classList.remove('show');
-  grid.classList.remove('hidden');
+
+  if(used.size === 10){
+    document.getElementById('thanks').classList.add('show');
+  } else {
+    grid.classList.remove('hidden');
+  }
 };
 </script>
 
