@@ -2,66 +2,113 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>SEMINAR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NUMTRIX</title>
 <style>
-  body{background:#111;color:#fff;font-family:sans-serif;text-align:center;padding:20px}
-  .grid{display:grid;grid-template-columns:repeat(5,70px);gap:15px;justify-content:center;margin-bottom:20px}
-  .num{background:#222;border:2px solid #555;border-radius:10px;width:70px;height:70px;
-       font-size:24px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;
-       transition:transform .2s, background .2s}
-  .num:hover{background:#444}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+    color:#fff;font-family:'Segoe UI',sans-serif;text-align:center;
+    min-height:100vh;display:flex;flex-direction:column;
+    align-items:center;justify-content:flex-start;padding:30px 15px;
+  }
+  h1{
+    font-size:clamp(28px,6vw,48px);
+    letter-spacing:3px;margin-bottom:6px;
+    background:linear-gradient(90deg,#0a84ff,#00e5ff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .sub{color:#aaa;font-size:14px;margin-bottom:30px}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(60px,80px));
+    gap:18px;justify-content:center;margin-bottom:25px;
+    max-width:500px;width:100%;
+  }
+  .num{
+    aspect-ratio:1/1;background:rgba(255,255,255,0.05);
+    border:2px solid #444;border-radius:16px;
+    font-size:clamp(18px,4vw,26px);font-weight:600;color:#fff;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:all .25s ease;
+    box-shadow:0 4px 10px rgba(0,0,0,.3);
+    backdrop-filter:blur(4px);
+  }
+  .num:hover{background:#0a84ff;border-color:#0a84ff;transform:translateY(-4px);
+    box-shadow:0 8px 18px rgba(10,132,255,.4)}
+
   .num.pop{animation:pop .35s ease}
   @keyframes pop{
     0%{transform:scale(1)}
     40%{transform:scale(1.3);background:#0a84ff}
     100%{transform:scale(0)}
   }
-  .num.used{background:#111;border-color:#333;color:#555;cursor:not-allowed;position:relative}
-  .num.used::after{content:"✕";position:absolute;color:red;font-size:28px}
+  .num.used{background:#0a0a12;border-color:#333;color:#555;cursor:not-allowed;
+    position:relative;box-shadow:none}
+  .num.used::after{content:"✕";position:absolute;color:#ff4d4d;font-size:clamp(20px,5vw,30px)}
+
   .grid.hidden{display:none}
-  video{display:none;width:90%;max-width:600px;margin-top:10px;background:#000}
+
+  video{
+    display:none;width:100%;max-width:640px;border-radius:14px;
+    background:#000;box-shadow:0 10px 30px rgba(0,0,0,.5);
+  }
   video.show{display:block}
-  #back{display:none;margin-top:15px;padding:8px 20px;background:#333;color:#fff;
-        border:none;border-radius:6px;cursor:pointer;font-size:16px}
+
+  #back{
+    display:none;margin-top:20px;padding:10px 26px;
+    background:linear-gradient(90deg,#0a84ff,#00c6ff);color:#fff;
+    border:none;border-radius:30px;cursor:pointer;font-size:16px;font-weight:600;
+    box-shadow:0 4px 14px rgba(10,132,255,.4);transition:transform .2s;
+  }
+  #back:hover{transform:scale(1.05)}
   #back.show{display:inline-block}
-  footer{margin-top:30px;color:#888;font-size:13px}
+
+  footer{
+    margin-top:auto;padding-top:40px;color:#777;font-size:12px;
+    line-height:1.6;max-width:500px;
+  }
+  footer b{color:#aaa}
+
+  /* mobile tweak */
+  @media (max-width:480px){
+    .grid{grid-template-columns:repeat(5,1fr);gap:10px}
+    .num{border-radius:12px}
+  }
 </style>
 </head>
 <body>
 
-<h2>NUMTRIX 😆</h2>
+<h1>NUMTRIX</h1>
+<div class="sub">tap a number to play</div>
+
 <div class="grid" id="grid"></div>
-<video id="player" controls autoplay></video>
+<video id="player" controls autoplay playsinline></video>
 <button id="back">⬅ Back</button>
 
-<footer>Project Organized by S5 BCA Students — Goutham, Yadhu, Justin, Anju, Suryagayathri</footer>
+<footer>
+  <b>Project Organized by S5 BCA Students</b><br>
+  Goutham • Yadhu • Justin • Anju • Suryagayathri
+</footer>
 
 <script>
-// video src map. edit path/url per number.
 const videos = {
-  1:"video1.mp4",
-  2:"video2.mp4",
-  3:"video3.mp4",
-  4:"video4.mp4",
-  5:"video5.mp4",
-  6:"video6.mp4",
-  7:"video7.mp4",
-  8:"video8.mp4",
-  9:"video9.mp4",
-  10:"video10.mp4"
+  1:"video1.mp4", 2:"video2.mp4", 3:"video3.mp4", 4:"video4.mp4", 5:"video5.mp4",
+  6:"video6.mp4", 7:"video7.mp4", 8:"video8.mp4", 9:"video9.mp4", 10:"video10.mp4"
 };
 
 const grid = document.getElementById('grid');
 const player = document.getElementById('player');
 const backBtn = document.getElementById('back');
-const used = new Set(); // numbers already picked
+const used = new Set();
 
 for(let i=1;i<=10;i++){
   const btn = document.createElement('div');
   btn.className='num';
   btn.textContent=i;
   btn.onclick=()=>{
-    if(used.has(i)) return; // already used, ignore click
+    if(used.has(i)) return;
     btn.classList.add('pop');
     setTimeout(()=>{
       used.add(i);
@@ -82,7 +129,7 @@ backBtn.onclick=()=>{
   player.pause();
   player.classList.remove('show');
   backBtn.classList.remove('show');
-  grid.classList.remove('hidden'); // used numbers stay marked, X persists
+  grid.classList.remove('hidden');
 };
 </script>
 
